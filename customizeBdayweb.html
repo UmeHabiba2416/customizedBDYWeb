@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Birthday Website Builder - Mobile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary-color: #ff6b9d;
+            --secondary-color: #feca57;
+            --accent-color: #48dbfb;
+            --text-dark: #2c3e50;
+            --text-light: #ffffff;
+            --bg-light: #f8f9fa;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --mobile-header-height: 60px;
+            --mobile-tab-height: 70px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Mobile-First Builder Interface */
+        .mobile-builder {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #ffffff;
+            position: relative;
+        }
+
+        /* Mobile Header */
+        .mobile-header {
+            height: var(--mobile-header-height);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 100;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .mobile-header h4 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .header-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .header-btn:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-top: var(--mobile-header-height);
+            margin-bottom: var(--mobile-tab-height);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            position: relative;
+        }
+
+        /* Control Panel - Mobile Bottom Sheet */
+        .control-panel-mobile {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+            z-index: 200;
+            transform: translateY(calc(100% - var(--mobile-tab-height)));
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-panel-mobile.expanded {
+            transform: translateY(0);
+        }
+
+        .panel-handle {
+            height: var(--mobile-tab-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .panel-handle::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+        }
+
+        .panel-tabs {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 20px;
+            gap: 10px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .panel-tab {
+            padding: 12px 20px;
+            background: white;
+            border: none;
+            border-radius: 20px;
+            white-space: nowrap;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            transition: var(--transition);
+            min-width: fit-content;
+        }
+
+        .panel-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        /* Mobile Form Controls */
+        .form-group-mobile {
+            margin-bottom: 20px;
+        }
+
+        .form-label-mobile {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .form-control-mobile {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-control-mobile:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255,107,157,0.1);
+        }
+
+        /* Mobile Theme Grid */
+        .theme-grid-mobile {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .theme-option-mobile {
+            height: 70px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .theme-option-mobile:active {
+            transform: scale(0.95);
+        }
+
+        .theme-option-mobile.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(255,107,157,0.2);
+        }
+
+        /* Mobile Color Picker */
+        .color-picker-mobile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        .color-input-mobile {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .color-hex-mobile {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* Mobile Toggle Switches */
+        .toggle-group-mobile {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .toggle-item-mobile {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .toggle-switch-mobile {
+            position: relative;
+            width: 50px;
+            height: 28px;
+        }
+
+        .toggle-switch-mobile input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider-mobile {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 28px;
+        }
+
+        .toggle-slider-mobile:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider-mobile {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .toggle-slider-mobile:before {
+            transform: translateX(22px);
+        }
+
+        /* Mobile Action Buttons */
+        .action-buttons-mobile {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-action-mobile {
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-action-mobile:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary-mobile {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .btn-secondary-mobile {
+            background: #f8f9fa;
+            color: var(--text-dark);
+            border: 2px solid #e0e0e0;
+        }
+
+        /* Birthday Website Preview - Mobile Optimized */
+        .birthday-site-mobile {
+            min-height: 100%;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .hero-section-mobile {
+            padding: 60px 20px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .hero-content-mobile h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            animation: fadeInUp 1s ease;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .hero-content-mobile .age {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s infinite;
+        }
+
+        /* Mobile Countdown */
+        .countdown-section-mobile {
+            padding: 40px 20px;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .countdown-timer-mobile {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        .countdown-item-mobile {
+            text-align: center;
+            padding: 20px 10px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: var(--transition);
+        }
+
+        .countdown-number-mobile {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .countdown-label-mobile {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Mobile Photo Gallery */
+        .gallery-section-mobile {
+            padding: 40px 20px;
+            background: var(--bg-light);
+        }
+
+        .photo-grid-mobile {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .photo-item-mobile {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 1;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+
+        .photo-item-mobile:active {
+            transform: scale(0.98);
+        }
+
+        .photo-item-mobile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Mobile Guestbook */
+        .guestbook-section-mobile {
+            padding: 40px 20px;
+            background: white;
+        }
+
+        .wish-card-mobile {
+            background: var(--bg-light);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 12px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wish-card-mobile::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+        }
+
+        /* Mobile Event Section */
+        .event-section-mobile {
+            padding: 40px 20px;
+            background: linear-gradient(135deg, rgba(255,107,157,0.1), rgba(254,202,87,0.1));
+        }
+
+        .event-card-mobile {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        /* Contact Section - Mobile */
+        .contact-section-mobile {
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+        }
+
+        .contact-card-mobile {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .contact-item-mobile {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .contact-item-mobile:active {
+            transform: scale(0.98);
+            background: #e9ecef;
+        }
+
+        .contact-item-mobile:last-child {
+            margin-bottom: 0;
+        }
+
+        .contact-icon-mobile {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.3rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .contact-info-mobile {
+            flex: 1;
+        }
+
+        .contact-label-mobile {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .contact-value-mobile {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            word-break: break-all;
+        }
+
+        .social-links-mobile {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .social-link-mobile {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .social-link-mobile:active {
+            transform: scale(0.95);
+        }
+
+        .social-facebook { background: #1877f2; }
+        .social-twitter { background: #000000; }
+        .social-instagram { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .social-linkedin { background: #0077b5; }
+        .social-youtube { background: #ff0000; }
+        .social-tiktok { background: #000000; }
+
+        /* Mobile Floating Buttons */
+        .fab-container-mobile {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            z-index: 150;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .fab-mobile {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fab-mobile:active {
+            transform: scale(0.95);
+        }
+
+        /* Mobile Modal */
+        .modal-mobile {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-mobile.show {
+            display: flex;
+        }
+
+        .modal-content-mobile {
+            background: white;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header-mobile {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-body-mobile {
+            padding: 20px;
+        }
+
+        /* Mobile Toast */
+        .toast-mobile {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 1001;
+            transform: translateY(-100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .toast-mobile.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Touch Optimizations */
+        .touch-target {
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Confetti Animation */
+        .confetti-mobile {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            position: absolute;
+            animation: confetti-fall 3s linear;
+            z-index: 9999;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner-mobile {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 380px) {
+            .hero-content-mobile h1 {
+                font-size: 2rem;
+            }
+            
+            .hero-content-mobile .age {
+                font-size: 3rem;
+            }
+            
+            .action-buttons-mobile {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Prevent zoom on input focus */
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="datetime-local"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="url"],
+        input[type="color"],
+        textarea,
+        select {
+            font-size: 16px !important;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Builder Container -->
+    <div class="mobile-builder">
+        <!-- Mobile Header -->
+        <header class="mobile-header">
+            <h4>
+                <i class="bi bi-balloon-fill"></i>
+                Birthday Builder
+            </h4>
+            <div class="header-actions">
+                <button class="header-btn" onclick="togglePreviewMode()">
+                    <i class="bi bi-eye"></i>
+                </button>
+                <button class="header-btn" onclick="saveWebsite()">
+                    <i class="bi bi-save"></i>
+                </button>
+                <button class="header-btn" onclick="publishWebsite()">
+                    <i class="bi bi-upload"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="mainContent">
+            <div class="birthday-site-mobile" id="birthdaySite">
+                <!-- Hero Section -->
+                <section class="hero-section-mobile" id="heroSection">
+                    <div class="hero-content-mobile">
+                        <h1 id="heroName">Happy Birthday!</h1>
+                        <div class="age" id="heroAge">25</div>
+                        <p class="lead mt-3" id="heroMessage">Wishing you a day filled with happiness!</p>
+                        <button class="btn btn-lg btn-light mt-4 touch-target" onclick="triggerConfetti()">
+                            <i class="bi bi-balloon"></i> Celebrate!
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Countdown Section -->
+                <section class="countdown-section-mobile" id="countdownSection">
+                    <h3 class="text-center mb-4">Countdown to Birthday</h3>
+                    <div class="countdown-timer-mobile">
+                        <div class="countdown-item-mobile">
+                            <span class="countdown-number-mobile" id="days">00</span>
+                            <span class="countdown-label-mobile">Days</span>
+                        </div>
+                        <div class="countdown-item-mobile">
+                            <span class="countdown-number-mobile" id="hours">00</span>
+                            <span class="countdown-label-mobile">Hours</span>
+                        </div>
+                        <div class="countdown-item-mobile">
+                            <span class="countdown-number-mobile" id="minutes">00</span>
+                            <span class="countdown-label-mobile">Minutes</span>
+                        </div>
+                        <div class="countdown-item-mobile">
+                            <span class="countdown-number-mobile" id="seconds">00</span>
+                            <span class="countdown-label-mobile">Seconds</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Photo Gallery Section -->
+                <section class="gallery-section-mobile" id="gallerySection">
+                    <h3 class="text-center mb-3">Photo Memories</h3>
+                    <div class="text-center mb-3">
+                        <button class="btn btn-primary touch-target" onclick="document.getElementById('photoUpload').click()">
+                            <i class="bi bi-camera"></i> Add Photos
+                        </button>
+                        <input type="file" id="photoUpload" accept="image/*" multiple style="display: none;" onchange="handlePhotoUpload(event)">
+                    </div>
+                    <div class="photo-grid-mobile" id="photoGrid">
+                        <div class="photo-item-mobile">
+                            <img src="https://picsum.photos/seed/bday1/400/400.jpg" alt="Memory">
+                        </div>
+                        <div class="photo-item-mobile">
+                            <img src="https://picsum.photos/seed/bday2/400/400.jpg" alt="Memory">
+                        </div>
+                        <div class="photo-item-mobile">
+                            <img src="https://picsum.photos/seed/bday3/400/400.jpg" alt="Memory">
+                        </div>
+                        <div class="photo-item-mobile">
+                            <img src="https://picsum.photos/seed/bday4/400/400.jpg" alt="Memory">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Guestbook Section -->
+                <section class="guestbook-section-mobile" id="guestbookSection">
+                    <h3 class="text-center mb-4">Birthday Wishes</h3>
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Leave a Wish</h5>
+                            <form onsubmit="addWish(event)">
+                                <div class="form-group-mobile">
+                                    <input type="text" class="form-control-mobile" id="wishName" placeholder="Your name" required>
+                                </div>
+                                <div class="form-group-mobile">
+                                    <textarea class="form-control-mobile" id="wishMessage" rows="3" placeholder="Your birthday wish..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100 touch-target">
+                                    <i class="bi bi-send"></i> Send Wish
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="wishesContainer">
+                        <div class="wish-card-mobile">
+                            <div class="wish-author">Sarah Johnson</div>
+                            <div class="wish-message">Happy Birthday! 🎉</div>
+                            <div class="wish-time">2 hours ago</div>
+                        </div>
+                        <div class="wish-card-mobile">
+                            <div class="wish-author">Mike Chen</div>
+                            <div class="wish-message">Wishing you the best! 🎂</div>
+                            <div class="wish-time">5 hours ago</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Event Section -->
+                <section class="event-section-mobile" id="eventSection">
+                    <h3 class="text-center mb-4">Birthday Party</h3>
+                    <div class="event-card-mobile">
+                        <div class="text-center mb-3">
+                            <i class="bi bi-calendar-heart" style="font-size: 2.5rem; color: var(--primary-color);"></i>
+                        </div>
+                        <h4 class="text-center mb-3" id="eventTitleDisplay">Birthday Celebration</h4>
+                        <div class="mb-3">
+                            <h6><i class="bi bi-clock"></i> Date & Time</h6>
+                            <p id="eventDateTimeDisplay">December 25, 2024 at 7:00 PM</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6><i class="bi bi-geo-alt"></i> Location</h6>
+                            <p id="eventLocationDisplay">123 Party Street</p>
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-primary btn-lg touch-target" onclick="rsvpEvent()">
+                                <i class="bi bi-envelope-check"></i> RSVP Now
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Contact Section -->
+                <section class="contact-section-mobile" id="contactSection">
+                    <h3 class="text-center mb-4">Get in Touch</h3>
+                    <div class="contact-card-mobile">
+                        <div class="contact-item-mobile" id="contactEmailItem" onclick="sendEmail()">
+                            <div class="contact-icon-mobile">
+                                <i class="bi bi-envelope"></i>
+                            </div>
+                            <div class="contact-info-mobile">
+                                <div class="contact-label-mobile">Email</div>
+                                <div class="contact-value-mobile" id="contactEmailDisplay">umehabiba1624@gmail.com</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center">
+                        <h5 class="mb-3">Follow Me</h5>
+                        <div class="social-links-mobile" id="socialLinksMobile">
+                            <div class="social-link-mobile social-linkedin" onclick="openSocial('linkedin')" style="display: flex;">
+                                <i class="bi bi-linkedin"></i>
+                            </div>
+                            <div class="social-link-mobile social-twitter" onclick="openSocial('twitter')" style="display: flex;">
+                                <i class="bi bi-twitter-x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- Mobile Control Panel -->
+        <div class="control-panel-mobile" id="controlPanel">
+            <div class="panel-handle" onclick="togglePanel()">
+                <span style="font-size: 0.9rem; color: #666;">Customize Your Site</span>
+            </div>
+            
+            <div class="panel-tabs">
+                <button class="panel-tab active" onclick="switchTab('basic')">Basic Info</button>
+                <button class="panel-tab" onclick="switchTab('theme')">Theme</button>
+                <button class="panel-tab" onclick="switchTab('sections')">Sections</button>
+                <button class="panel-tab" onclick="switchTab('event')">Event</button>
+                <button class="panel-tab" onclick="switchTab('contact')">Contact</button>
+                <button class="panel-tab" onclick="switchTab('actions')">Actions</button>
+            </div>
+
+            <div class="panel-content">
+                <!-- Basic Info Tab -->
+                <div class="tab-content active" id="basicTab">
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Name</label>
+                        <input type="text" class="form-control-mobile" id="personName" placeholder="Enter name" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Age</label>
+                        <input type="number" class="form-control-mobile" id="personAge" placeholder="Enter age" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Birthday Date</label>
+                        <input type="date" class="form-control-mobile" id="birthdayDate" onchange="updatePreview()">
+                    </div>
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Message</label>
+                        <textarea class="form-control-mobile" id="personalMessage" rows="3" placeholder="Add a special message..." oninput="updatePreview()"></textarea>
+                    </div>
+                </div>
+
+                <!-- Theme Tab -->
+                <div class="tab-content" id="themeTab">
+                    <h5 class="mb-3">Choose Theme</h5>
+                    <div class="theme-grid-mobile">
+                        <div class="theme-option-mobile active" data-theme="celebration" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="applyTheme('celebration')"></div>
+                        <div class="theme-option-mobile" data-theme="sunset" style="background: linear-gradient(135deg, #f093fb, #f5576c);" onclick="applyTheme('sunset')"></div>
+                        <div class="theme-option-mobile" data-theme="ocean" style="background: linear-gradient(135deg, #4facfe, #00f2fe);" onclick="applyTheme('ocean')"></div>
+                        <div class="theme-option-mobile" data-theme="forest" style="background: linear-gradient(135deg, #43e97b, #38f9d7);" onclick="applyTheme('forest')"></div>
+                        <div class="theme-option-mobile" data-theme="candy" style="background: linear-gradient(135deg, #fa709a, #fee140);" onclick="applyTheme('candy')"></div>
+                        <div class="theme-option-mobile" data-theme="midnight" style="background: linear-gradient(135deg, #30cfd0, #330867);" onclick="applyTheme('midnight')"></div>
+                    </div>
+                    
+                    <h5 class="mb-3 mt-4">Custom Colors</h5>
+                    <div class="color-picker-mobile">
+                        <input type="color" class="color-input-mobile" id="primaryColor" value="#ff6b9d" onchange="applyCustomColors()">
+                        <input type="text" class="color-hex-mobile" id="primaryColorHex" value="#ff6b9d" onchange="syncColor('primary')">
+                    </div>
+                    <div class="color-picker-mobile">
+                        <input type="color" class="color-input-mobile" id="secondaryColor" value="#feca57" onchange="applyCustomColors()">
+                        <input type="text" class="color-hex-mobile" id="secondaryColorHex" value="#feca57" onchange="syncColor('secondary')">
+                    </div>
+                </div>
+
+                <!-- Sections Tab -->
+                <div class="tab-content" id="sectionsTab">
+                    <h5 class="mb-3">Website Sections</h5>
+                    <div class="toggle-group-mobile">
+                        <div class="toggle-item-mobile">
+                            <span>Countdown Timer</span>
+                            <label class="toggle-switch-mobile">
+                                <input type="checkbox" id="showCountdown" checked onchange="toggleSection('countdown')">
+                                <span class="toggle-slider-mobile"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item-mobile">
+                            <span>Photo Gallery</span>
+                            <label class="toggle-switch-mobile">
+                                <input type="checkbox" id="showGallery" checked onchange="toggleSection('gallery')">
+                                <span class="toggle-slider-mobile"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item-mobile">
+                            <span>Guestbook</span>
+                            <label class="toggle-switch-mobile">
+                                <input type="checkbox" id="showGuestbook" checked onchange="toggleSection('guestbook')">
+                                <span class="toggle-slider-mobile"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item-mobile">
+                            <span>Event Details</span>
+                            <label class="toggle-switch-mobile">
+                                <input type="checkbox" id="showEvent" checked onchange="toggleSection('event')">
+                                <span class="toggle-slider-mobile"></span>
+                            </label>
+                        </div>
+                        <div class="toggle-item-mobile">
+                            <span>Contact Information</span>
+                            <label class="toggle-switch-mobile">
+                                <input type="checkbox" id="showContact" checked onchange="toggleSection('contact')">
+                                <span class="toggle-slider-mobile"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Tab -->
+                <div class="tab-content" id="eventTab">
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Event Title</label>
+                        <input type="text" class="form-control-mobile" id="eventTitle" placeholder="Birthday Party" oninput="updateEventDetails()">
+                    </div>
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Date & Time</label>
+                        <input type="datetime-local" class="form-control-mobile" id="eventDateTime" onchange="updateEventDetails()">
+                    </div>
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Location</label>
+                        <input type="text" class="form-control-mobile" id="eventLocation" placeholder="Enter venue" oninput="updateEventDetails()">
+                    </div>
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">RSVP Email</label>
+                        <input type="email" class="form-control-mobile" id="rsvpEmail" placeholder="rsvp@example.com" oninput="updateEventDetails()">
+                    </div>
+                </div>
+
+                <!-- Contact Tab -->
+                <div class="tab-content" id="contactTab">
+                    <h5 class="mb-3">Contact Information</h5>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Email Address</label>
+                        <input type="email" class="form-control-mobile" id="contactEmail" placeholder="contact@example.com" value="umehabiba1624@gmail.com" oninput="updateContactDetails()">
+                    </div>
+                    
+                    <h5 class="mb-3 mt-4">Social Media Links</h5>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">LinkedIn</label>
+                        <input type="url" class="form-control-mobile" id="socialLinkedin" placeholder="https://linkedin.com/in/username" value="https://www.linkedin.com/in/um-e-habiba-031b6a301/" oninput="updateSocialLinks()">
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">X (Twitter)</label>
+                        <input type="url" class="form-control-mobile" id="socialTwitter" placeholder="https://x.com/username" value="https://x.com/umehabiba1624" oninput="updateSocialLinks()">
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Facebook</label>
+                        <input type="url" class="form-control-mobile" id="socialFacebook" placeholder="https://facebook.com/username" oninput="updateSocialLinks()">
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">Instagram</label>
+                        <input type="url" class="form-control-mobile" id="socialInstagram" placeholder="https://instagram.com/username" oninput="updateSocialLinks()">
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">YouTube</label>
+                        <input type="url" class="form-control-mobile" id="socialYoutube" placeholder="https://youtube.com/channel/username" oninput="updateSocialLinks()">
+                    </div>
+                    
+                    <div class="form-group-mobile">
+                        <label class="form-label-mobile">TikTok</label>
+                        <input type="url" class="form-control-mobile" id="socialTiktok" placeholder="https://tiktok.com/@username" oninput="updateSocialLinks()">
+                    </div>
+                </div>
+
+                <!-- Actions Tab -->
+                <div class="tab-content" id="actionsTab">
+                    <div class="action-buttons-mobile">
+                        <button class="btn-action-mobile btn-primary-mobile" onclick="saveWebsite()">
+                            <i class="bi bi-save"></i> Save
+                        </button>
+                        <button class="btn-action-mobile btn-primary-mobile" onclick="publishWebsite()">
+                            <i class="bi bi-upload"></i> Publish
+                        </button>
+                        <button class="btn-action-mobile btn-secondary-mobile" onclick="shareWebsite()">
+                            <i class="bi bi-share"></i> Share
+                        </button>
+                        <button class="btn-action-mobile btn-secondary-mobile" onclick="downloadWebsite()">
+                            <i class="bi bi-download"></i> Download
+                        </button>
+                        <button class="btn-action-mobile btn-secondary-mobile" onclick="resetWebsite()">
+                            <i class="bi bi-arrow-clockwise"></i> Reset
+                        </button>
+                        <button class="btn-action-mobile btn-secondary-mobile" onclick="previewWebsite()">
+                            <i class="bi bi-eye"></i> Preview
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Floating Buttons -->
+        <div class="fab-container-mobile">
+            <button class="fab-mobile" onclick="togglePanel()">
+                <i class="bi bi-palette"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile Toast -->
+    <div class="toast-mobile" id="toastMobile">
+        <i class="bi bi-check-circle-fill text-success"></i>
+        <span id="toastMessage">Success!</span>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal-mobile" id="shareModal">
+        <div class="modal-content-mobile">
+            <div class="modal-header-mobile">
+                <h5 class="mb-0">Share Birthday Website</h5>
+                <button onclick="closeModal('shareModal')" style="background: none; border: none; color: white; font-size: 1.5rem;">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="modal-body-mobile">
+                <p class="mb-3">Share this special birthday website!</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control-mobile" id="shareUrl" readonly value="https://birthday.site/umehabiba1624">
+                    <button class="btn btn-primary" onclick="copyShareUrl()">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary touch-target" onclick="shareOnSocial('facebook')">
+                        <i class="bi bi-facebook"></i> Facebook
+                    </button>
+                    <button class="btn btn-dark touch-target" onclick="shareOnSocial('twitter')">
+                        <i class="bi bi-twitter-x"></i> X (Twitter)
+                    </button>
+                    <button class="btn btn-success touch-target" onclick="shareOnSocial('whatsapp')">
+                        <i class="bi bi-whatsapp"></i> WhatsApp
+                    </button>
+                    <button class="btn btn-secondary touch-target" onclick="shareViaEmail()">
+                        <i class="bi bi-envelope"></i> Email
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Website Data Storage with your contact information
+        let websiteData = {
+            name: '',
+            age: 25,
+            birthdayDate: '',
+            message: '',
+            theme: 'celebration',
+            primaryColor: '#ff6b9d',
+            secondaryColor: '#feca57',
+            sections: {
+                countdown: true,
+                gallery: true,
+                guestbook: true,
+                event: true,
+                contact: true
+            },
+            event: {
+                title: 'Birthday Celebration',
+                dateTime: '',
+                location: '',
+                rsvpEmail: ''
+            },
+            contact: {
+                email: 'umehabiba1624@gmail.com'
+            },
+            social: {
+                facebook: '',
+                twitter: 'https://x.com/umehabiba1624',
+                instagram: '',
+                linkedin: 'https://www.linkedin.com/in/um-e-habiba-031b6a301/',
+                youtube: '',
+                tiktok: ''
+            },
+            photos: [],
+            wishes: []
+        };
+
+        // Theme Definitions
+        const themes = {
+            celebration: {
+                primary: '#667eea',
+                secondary: '#764ba2',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+            },
+            sunset: {
+                primary: '#f093fb',
+                secondary: '#f5576c',
+                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+            },
+            ocean: {
+                primary: '#4facfe',
+                secondary: '#00f2fe',
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+            },
+            forest: {
+                primary: '#43e97b',
+                secondary: '#38f9d7',
+                background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)'
+            },
+            candy: {
+                primary: '#fa709a',
+                secondary: '#fee140',
+                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+            },
+            midnight: {
+                primary: '#30cfd0',
+                secondary: '#330867',
+                background: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)'
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            initializeMobileFeatures();
+            startCountdown();
+            updatePreview();
+            updateContactDetails();
+            updateSocialLinks();
+        });
+
+        // Mobile Features Initialization
+        function initializeMobileFeatures() {
+            // Touch gestures for panel
+            let touchStartY = 0;
+            let touchEndY = 0;
+            const panel = document.getElementById('controlPanel');
+            
+            panel.addEventListener('touchstart', function(e) {
+                touchStartY = e.changedTouches[0].screenY;
+            });
+            
+            panel.addEventListener('touchend', function(e) {
+                touchEndY = e.changedTouches[0].screenY;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                const swipeDistance = touchStartY - touchEndY;
+                if (Math.abs(swipeDistance) > 50) {
+                    if (swipeDistance > 0) {
+                        // Swipe up - expand panel
+                        panel.classList.add('expanded');
+                    } else {
+                        // Swipe down - collapse panel
+                        panel.classList.remove('expanded');
+                    }
+                }
+            }
+            
+            // Prevent zoom on double tap
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            });
+            
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(e) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+        }
+
+        // Toggle Panel
+        function togglePanel() {
+            const panel = document.getElementById('controlPanel');
+            panel.classList.toggle('expanded');
+        }
+
+        // Switch Tab
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.panel-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        // Update Preview
+        function updatePreview() {
+            const name = document.getElementById('personName').value || 'Happy Birthday!';
+            const age = document.getElementById('personAge').value || '25';
+            const message = document.getElementById('personalMessage').value || 'Wishing you a day filled with happiness!';
+
+            document.getElementById('heroName').textContent = name;
+            document.getElementById('heroAge').textContent = age;
+            document.getElementById('heroMessage').textContent = message;
+
+            websiteData.name = name;
+            websiteData.age = age;
+            websiteData.message = message;
+            websiteData.birthdayDate = document.getElementById('birthdayDate').value;
+
+            saveToLocalStorage();
+        }
+
+        // Apply Theme
+        function applyTheme(themeName) {
+            const theme = themes[themeName];
+            document.getElementById('heroSection').style.background = theme.background;
+            document.documentElement.style.setProperty('--primary-color', theme.primary);
+            document.documentElement.style.setProperty('--secondary-color', theme.secondary);
+            
+            document.querySelectorAll('.theme-option-mobile').forEach(o => o.classList.remove('active'));
+            document.querySelector(`[data-theme="${themeName}"]`).classList.add('active');
+            
+            websiteData.theme = themeName;
+            websiteData.primaryColor = theme.primary;
+            websiteData.secondaryColor = theme.secondary;
+            
+            saveToLocalStorage();
+            showToast('Theme applied!', 'success');
+        }
+
+        // Apply Custom Colors
+        function applyCustomColors() {
+            const primary = document.getElementById('primaryColor').value;
+            const secondary = document.getElementById('secondaryColor').value;
+            
+            document.documentElement.style.setProperty('--primary-color', primary);
+            document.documentElement.style.setProperty('--secondary-color', secondary);
+            
+            document.getElementById('primaryColorHex').value = primary;
+            document.getElementById('secondaryColorHex').value = secondary;
+            
+            websiteData.primaryColor = primary;
+            websiteData.secondaryColor = secondary;
+            
+            saveToLocalStorage();
+        }
+
+        // Sync Color
+        function syncColor(type) {
+            if (type === 'primary') {
+                const hex = document.getElementById('primaryColorHex').value;
+                document.getElementById('primaryColor').value = hex;
+            } else {
+                const hex = document.getElementById('secondaryColorHex').value;
+                document.getElementById('secondaryColor').value = hex;
+            }
+            applyCustomColors();
+        }
+
+        // Toggle Section
+        function toggleSection(section) {
+            const checkbox = document.getElementById('show' + section.charAt(0).toUpperCase() + section.slice(1));
+            const sectionElement = document.getElementById(section + 'Section');
+            sectionElement.style.display = checkbox.checked ? 'block' : 'none';
+            
+            websiteData.sections[section] = checkbox.checked;
+            saveToLocalStorage();
+        }
+
+        // Update Event Details
+        function updateEventDetails() {
+            const title = document.getElementById('eventTitle').value || 'Birthday Celebration';
+            const dateTime = document.getElementById('eventDateTime').value;
+            const location = document.getElementById('eventLocation').value || '123 Party Street';
+            
+            document.getElementById('eventTitleDisplay').textContent = title;
+            document.getElementById('eventLocationDisplay').textContent = location;
+            
+            if (dateTime) {
+                const date = new Date(dateTime);
+                const options = { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric', 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                };
+                document.getElementById('eventDateTimeDisplay').textContent = date.toLocaleDateString('en-US', options);
+            }
+            
+            websiteData.event = {
+                title: title,
+                dateTime: dateTime,
+                location: location,
+                rsvpEmail: document.getElementById('rsvpEmail').value
+            };
+            
+            saveToLocalStorage();
+        }
+
+        // Update Contact Details
+        function updateContactDetails() {
+            const email = document.getElementById('contactEmail').value || 'umehabiba1624@gmail.com';
+            
+            document.getElementById('contactEmailDisplay').textContent = email;
+            
+            websiteData.contact = {
+                email: email
+            };
+            
+            saveToLocalStorage();
+        }
+
+        // Update Social Links
+        function updateSocialLinks() {
+            const socialData = {
+                facebook: document.getElementById('socialFacebook').value,
+                twitter: document.getElementById('socialTwitter').value,
+                instagram: document.getElementById('socialInstagram').value,
+                linkedin: document.getElementById('socialLinkedin').value,
+                youtube: document.getElementById('socialYoutube').value,
+                tiktok: document.getElementById('socialTiktok').value
+            };
+            
+            websiteData.social = socialData;
+            
+            // Show/hide social icons based on whether URLs are provided
+            Object.keys(socialData).forEach(platform => {
+                const icon = document.querySelector(`.social-${platform}`);
+                if (icon) {
+                    icon.style.display = socialData[platform] ? 'flex' : 'none';
+                }
+            });
+            
+            saveToLocalStorage();
+        }
+
+        // Contact Actions
+        function sendEmail() {
+            const email = websiteData.contact.email;
+            if (email) {
+                window.location.href = `mailto:${email}`;
+            }
+        }
+
+        function openSocial(platform) {
+            const url = websiteData.social[platform];
+            if (url) {
+                window.open(url, '_blank');
+            }
+        }
+
+        // Countdown Timer
+        function startCountdown() {
+            setInterval(() => {
+                const birthdayDate = document.getElementById('birthdayDate').value;
+                if (!birthdayDate) return;
+                
+                const now = new Date().getTime();
+                const birthday = new Date(birthdayDate).getTime();
+                const distance = birthday - now;
+                
+                if (distance < 0) {
+                    document.getElementById('days').textContent = '00';
+                    document.getElementById('hours').textContent = '00';
+                    document.getElementById('minutes').textContent = '00';
+                    document.getElementById('seconds').textContent = '00';
+                    return;
+                }
+                
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                
+                document.getElementById('days').textContent = String(days).padStart(2, '0');
+                document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('seconds').textContent = String(seconds).padStart(2, '0');
+            }, 1000);
+        }
+
+        // Photo Upload
+        function handlePhotoUpload(event) {
+            const files = event.target.files;
+            const photoGrid = document.getElementById('photoGrid');
+            
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const photoItem = document.createElement('div');
+                        photoItem.className = 'photo-item-mobile';
+                        photoItem.innerHTML = `<img src="${e.target.result}" alt="Memory">`;
+                        photoGrid.appendChild(photoItem);
+                        websiteData.photos.push(e.target.result);
+                        saveToLocalStorage();
+                        showToast('Photo added!', 'success');
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        // Add Wish
+        function addWish(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('wishName').value;
+            const message = document.getElementById('wishMessage').value;
+            
+            const wishCard = document.createElement('div');
+            wishCard.className = 'wish-card-mobile';
+            wishCard.innerHTML = `
+                <div class="wish-author">${name}</div>
+                <div class="wish-message">${message}</div>
+                <div class="wish-time">Just now</div>
+            `;
+            
+            document.getElementById('wishesContainer').insertBefore(wishCard, document.getElementById('wishesContainer').firstChild);
+            
+            websiteData.wishes.unshift({ name, message, time: new Date().toISOString() });
+            saveToLocalStorage();
+            
+            document.getElementById('wishName').value = '';
+            document.getElementById('wishMessage').value = '';
+            
+            showToast('Wish added!', 'success');
+            triggerConfetti();
+        }
+
+        // RSVP Event
+        function rsvpEvent() {
+            const email = document.getElementById('rsvpEmail').value;
+            if (email) {
+                window.location.href = `mailto:${email}?subject=RSVP for Birthday Party&body=I would like to RSVP!`;
+            } else {
+                showToast('Add RSVP email first', 'error');
+            }
+        }
+
+        // Confetti Effect
+        function triggerConfetti() {
+            const colors = ['#ff6b9d', '#feca57', '#48dbfb', '#ff9ff3', '#54a0ff'];
+            
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti-mobile';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+        }
+
+        // Toggle Preview Mode
+        function togglePreviewMode() {
+            const panel = document.getElementById('controlPanel');
+            const isHidden = panel.style.display === 'none';
+            panel.style.display = isHidden ? 'flex' : 'none';
+            showToast(isHidden ? 'Edit mode' : 'Preview mode', 'info');
+        }
+
+        // Save Website
+        function saveWebsite() {
+            saveToLocalStorage();
+            showToast('Website saved!', 'success');
+        }
+
+        // Publish Website
+        function publishWebsite() {
+            showToast('Publishing...', 'info');
+            setTimeout(() => {
+                showToast('Published successfully!', 'success');
+                shareWebsite();
+            }, 2000);
+        }
+
+        // Share Website
+        function shareWebsite() {
+            document.getElementById('shareModal').classList.add('show');
+        }
+
+        // Close Modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Copy Share URL
+        function copyShareUrl() {
+            const shareUrl = document.getElementById('shareUrl');
+            shareUrl.select();
+            document.execCommand('copy');
+            showToast('Link copied!', 'success');
+        }
+
+        // Share on Social Media
+        function shareOnSocial(platform) {
+            const url = encodeURIComponent(document.getElementById('shareUrl').value);
+            const text = encodeURIComponent('Check out this amazing birthday website!');
+            
+            let shareUrl = '';
+            switch(platform) {
+                case 'facebook':
+                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                    break;
+                case 'twitter':
+                    shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`;
+                    break;
+                case 'whatsapp':
+                    shareUrl = `https://wa.me/?text=${text}%20${url}`;
+                    break;
+            }
+            
+            if (shareUrl) {
+                window.open(shareUrl, '_blank');
+            }
+        }
+
+        // Share via Email
+        function shareViaEmail() {
+            const url = document.getElementById('shareUrl').value;
+            const subject = encodeURIComponent('Birthday Website');
+            const body = encodeURIComponent(`Check out this birthday website: ${url}`);
+            window.location.href = `mailto:?subject=${subject}&body=${body}`;
+        }
+
+        // Download Website
+        function downloadWebsite() {
+            const dataStr = JSON.stringify(websiteData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'birthday-website.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            showToast('Downloaded!', 'success');
+        }
+
+        // Reset Website
+        function resetWebsite() {
+            if (confirm('Reset all changes?')) {
+                localStorage.removeItem('birthdayWebsiteData');
+                location.reload();
+            }
+        }
+
+        // Preview Website
+        function previewWebsite() {
+            const panel = document.getElementById('controlPanel');
+            panel.classList.remove('expanded');
+            showToast('Preview mode - Tap palette to edit', 'info');
+        }
+
+        // Toast Notification
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toastMobile');
+            const toastMessage = document.getElementById('toastMessage');
+            
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Local Storage Functions
+        function saveToLocalStorage() {
+            localStorage.setItem('birthdayWebsiteData', JSON.stringify(websiteData));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('birthdayWebsiteData');
+            if (saved) {
+                websiteData = JSON.parse(saved);
+            }
+            
+            // Restore form values
+            document.getElementById('personName').value = websiteData.name || '';
+            document.getElementById('personAge').value = websiteData.age || '';
+            document.getElementById('birthdayDate').value = websiteData.birthdayDate || '';
+            document.getElementById('personalMessage').value = websiteData.message || '';
+            document.getElementById('primaryColor').value = websiteData.primaryColor || '#ff6b9d';
+            document.getElementById('primaryColorHex').value = websiteData.primaryColor || '#ff6b9d';
+            document.getElementById('secondaryColor').value = websiteData.secondaryColor || '#feca57';
+            document.getElementById('secondaryColorHex').value = websiteData.secondaryColor || '#feca57';
+            
+            // Restore event details
+            document.getElementById('eventTitle').value = websiteData.event.title || '';
+            document.getElementById('eventDateTime').value = websiteData.event.dateTime || '';
+            document.getElementById('eventLocation').value = websiteData.event.location || '';
+            document.getElementById('rsvpEmail').value = websiteData.event.rsvpEmail || '';
+            
+            // Restore contact details with your info
+            document.getElementById('contactEmail').value = websiteData.contact.email || 'umehabiba1624@gmail.com';
+            
+            // Restore social links with your info
+            document.getElementById('socialFacebook').value = websiteData.social.facebook || '';
+            document.getElementById('socialTwitter').value = websiteData.social.twitter || 'https://x.com/umehabiba1624';
+            document.getElementById('socialInstagram').value = websiteData.social.instagram || '';
+            document.getElementById('socialLinkedin').value = websiteData.social.linkedin || 'https://www.linkedin.com/in/um-e-habiba-031b6a301/';
+            document.getElementById('socialYoutube').value = websiteData.social.youtube || '';
+            document.getElementById('socialTiktok').value = websiteData.social.tiktok || '';
+            
+            // Apply theme
+            if (websiteData.theme) {
+                applyTheme(websiteData.theme);
+            }
+            
+            // Apply custom colors
+            applyCustomColors();
+            
+            // Update preview
+            updatePreview();
+            updateEventDetails();
+            updateContactDetails();
+            updateSocialLinks();
+        }
+
+        // Handle back button
+        window.addEventListener('popstate', function(event) {
+            if (document.getElementById('controlPanel').classList.contains('expanded')) {
+                document.getElementById('controlPanel').classList.remove('expanded');
+                history.pushState(null, null, location.href);
+            }
+        });
+
+        // Prevent pull-to-refresh
+        document.body.addEventListener('touchmove', function(e) {
+            if (e.touches[0].clientY < 100 && document.body.scrollTop === 0) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
